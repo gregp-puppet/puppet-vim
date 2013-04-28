@@ -9,6 +9,9 @@
 #   }
 #
 class vim {
+  $home = "/Users/${::boxen_user}"
+  $vimrc = "${home}/.vimrc"
+  $vimdir = "${home}/.vim"
 
   package { 'vim':
     require => Package['mercurial']
@@ -16,24 +19,24 @@ class vim {
   # Install mercurial since the vim brew package don't satisfy the requirement
   package { 'mercurial': }
 
-  file { ["/Users/${::boxen_user}/.vim",
-    "/Users/${::boxen_user}/.vim/autoload",
-    "/Users/${::boxen_user}/.vim/bundle"]:
+  file { ["${vimdir}",
+    "${vimdir}/autoload",
+    "${vimdir}/bundle"]:
     ensure  => directory,
     recurse => true,
   }
 
-  repository { "/Users/${::boxen_user}/.vim/vim-pathogen":
+  repository { "${vimdir}/vim-pathogen":
     source => 'tpope/vim-pathogen'
   }
 
-  file { "/Users/${::boxen_user}/.vim/autoload/pathogen.vim":
-    target  => "/Users/${::boxen_user}/.vim/vim-pathogen/autoload/pathogen.vim",
+  file { "${vimdir}/autoload/pathogen.vim":
+    target  => "${vimdir}/vim-pathogen/autoload/pathogen.vim",
     require => [
-      File["/Users/${::boxen_user}/.vim"],
-      File["/Users/${::boxen_user}/.vim/autoload"],
-      File["/Users/${::boxen_user}/.vim/bundle"],
-      Repository["/Users/${::boxen_user}/.vim/vim-pathogen"]
+      File["${vimdir}"],
+      File["${vimdir}/autoload"],
+      File["${vimdir}/bundle"],
+      Repository["${vimdir}/vim-pathogen"]
     ]
   }
 
@@ -41,7 +44,7 @@ class vim {
   file_line { 'load_pathogen':
     ensure  => present,
     line    => 'execute pathogen#infect()',
-    path    => "/Users/${::boxen_user}/.vimrc",
-    require => File["/Users/${::boxen_user}/.vimrc"]
+    path    => "${vimrc}",
+    require => File["${vimrc}"]
   }
 }
